@@ -1,81 +1,53 @@
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { Metadata } from 'next'
-
-import { getApolloClient } from '@/lib/apollo-client'
-import { getPostsByCategories } from '@/lib/posts'
-import { fetchSeoMetadata } from '@/lib/seo'
-
 import Hero from '@/components/hero/Hero'
 import PostsList from '@/components/postsList/PostsList'
-import { GET_PAGE } from '@/graphql/queries/getPage'
-import { PageData } from '@/graphql/types/pageTypes'
+import { getApolloClient } from '@/lib/apollo-client'
+import { createLocalizedPageTemplate } from '@/lib/pageTemplates'
+import { getPostsByCategories } from '@/lib/posts'
 
-interface LocalePageProps {
-	params: {
-		locale: string
-	}
+// ID главной страницы в CMS
+const HOME_PAGE_ID = 'cG9zdDoxMA=='
+
+// ID категорий для разных языков
+const CATEGORY_IDS = {
+	ru: ['17'],
+	en: ['19'],
 }
 
-export async function generateMetadata({
-	params: { locale },
-}: LocalePageProps): Promise<Metadata> {
-	const pageId = 'cG9zdDoxMA==' // Замените на соответствующий ID для главной страницы
-	// Преобразуем locale в формат LanguageCodeEnum
-	const language = locale === 'ru' ? 'RU' : 'EN'
-	const seo = await fetchSeoMetadata(pageId, language)
+// Создаем локализованную страницу с помощью шаблона
+const { generateMetadata, generateStaticParams, Page } =
+	createLocalizedPageTemplate(
+		HOME_PAGE_ID,
+		async ({ pagecontent, title, locale }) => {
+			const apolloClient = getApolloClient()
+			const categoryIn = CATEGORY_IDS[locale as keyof typeof CATEGORY_IDS]
 
-	return {
-		title: seo.title,
-		description: seo.description,
-	}
-}
+			const posts = await getPostsByCategories(
+				apolloClient,
+				locale === 'ru' ? 'RU' : 'EN',
+				categoryIn,
+				locale
+			)
 
-export async function generateStaticParams() {
-	return [{ locale: 'ru' }, { locale: 'en' }]
-}
+			return (
+				<div className='cont'>
+					<h1>{title}</h1>
 
-const HomePage = async ({ params: { locale } }: LocalePageProps) => {
-	const apolloClient: ApolloClient<NormalizedCacheObject> = getApolloClient()
+					{pagecontent.heroImage && (
+						<Hero
+							src={pagecontent.heroImage.node.link}
+							alt={pagecontent.heroImage.node.altText}
+						/>
+					)}
 
-	const pageId = 'cG9zdDoxMA==' // ID твоей главной страницы
-	// Преобразуем locale в формат LanguageCodeEnum
-	const language = locale === 'ru' ? 'RU' : 'EN'
-
-	// ID категорий для разных языков (в формате строк для GraphQL)
-	const categoryIds = {
-		ru: ['17'], // Можно указать несколько категорий для русского языка
-		en: ['19'], // Можно указать несколько категорий для английского языка
-	}
-
-	// Получаем массив ID категорий для текущего языка
-	const categoryIn = categoryIds[locale as keyof typeof categoryIds]
-
-	// Параллельное выполнение запросов
-	const [pageResult, posts] = await Promise.all([
-		apolloClient.query<PageData>({
-			query: GET_PAGE,
-			variables: { id: pageId, language },
-		}),
-		getPostsByCategories(apolloClient, language, categoryIn, locale),
-	])
-
-	// Получаем данные страницы, если они есть
-	const page = pageResult.data.page.translation.pagecontent
-	const title = pageResult.data.page.translation.title
-
-	return (
-		<div className='cont'>
-			<h1>{title}</h1>
-
-			<Hero src={page.heroImage.node.link} alt={page.heroImage.node.altText} />
-
-			<PostsList
-				postsTitle={locale === 'ru' ? 'Список постов' : 'Posts list'}
-				posts={posts}
-				readText={locale === 'ru' ? 'Читать статью' : 'Read article'}
-			/>
-		</div>
+					<PostsList
+						postsTitle={locale === 'ru' ? 'Список постов' : 'Posts list'}
+						posts={posts}
+						readText={locale === 'ru' ? 'Читать статью' : 'Read article'}
+					/>
+				</div>
+			)
+		}
 	)
-}
 
-export default HomePage
+export { generateMetadata, generateStaticParams }
+export default Page
