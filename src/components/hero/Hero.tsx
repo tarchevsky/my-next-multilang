@@ -6,12 +6,12 @@ const Hero = ({ title, buttonText, src, alt }: HeroProps) => {
 		<main className='hero md:min-h-[80vh]'>
 			<div className='relative hero-content flex-col lg:flex-row'>
 				<Image
-					className='lg:w-1/2 h-[600px] object-cover rounded-box shadow-2xl'
+					className='lg:w-1/2 h-40 md:h-[600px] object-cover rounded-box shadow-2xl'
 					src={src}
 					alt={alt || 'Картинка, назначение не написано'}
 					loading='lazy'
-					width={800}
-					height={600}
+					width={1200}
+					height={900}
 					quality={75}
 				/>
 				<div className='absolute lg:relative lg:ml-[-100px] z-10'>
