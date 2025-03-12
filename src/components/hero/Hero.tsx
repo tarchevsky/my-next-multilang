@@ -9,10 +9,10 @@ const Hero = ({ title, buttonText, src, alt }: HeroProps) => {
 					className='lg:w-1/2 h-40 md:h-[600px] object-cover rounded-box shadow-2xl'
 					src={src}
 					alt={alt || 'Картинка, назначение не написано'}
-					loading='lazy'
+					priority
 					width={1200}
 					height={900}
-					quality={75}
+					quality={60}
 				/>
 				<div className='absolute lg:relative lg:ml-[-100px] z-10'>
 					{title ? (
