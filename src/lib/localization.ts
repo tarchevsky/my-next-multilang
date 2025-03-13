@@ -42,15 +42,50 @@ export async function getLocalizedPageData(pageId: string, locale: string) {
 			variables: { id: pageId, language },
 		})
 
-		return {
+		// Проверяем, есть ли поле underConstruction и его значение
+		// Преобразуем значение в булевое, чтобы избежать проблем с типами
+		let isUnderConstruction = false
+
+		try {
+			// Получаем значение underConstruction
+			const underConstructionData = data.page.translation.underConstruction
+
+			// Если данные есть, пытаемся получить значение
+			if (
+				underConstructionData &&
+				underConstructionData.underConstruction !== undefined
+			) {
+				// Преобразуем в булевое значение в зависимости от типа
+				if (typeof underConstructionData.underConstruction === 'boolean') {
+					isUnderConstruction = underConstructionData.underConstruction
+				} else if (
+					typeof underConstructionData.underConstruction === 'string'
+				) {
+					isUnderConstruction =
+						underConstructionData.underConstruction === 'true'
+				} else {
+					// Для других типов преобразуем в булевое
+					isUnderConstruction = Boolean(underConstructionData.underConstruction)
+				}
+			}
+		} catch (e) {
+			console.error('Error processing underConstruction data:', e)
+		}
+
+		// Создаем результат
+		const result = {
 			pagecontent: data.page.translation.pagecontent,
 			title: data.page.translation.title,
+			underConstruction: isUnderConstruction,
 		}
+
+		return result
 	} catch (error) {
 		console.error('Error fetching page data:', error)
 		return {
 			pagecontent: null,
 			title: locale === 'ru' ? 'Ошибка загрузки' : 'Loading Error',
+			underConstruction: false,
 		}
 	}
 }

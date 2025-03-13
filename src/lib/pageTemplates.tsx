@@ -1,3 +1,4 @@
+import UnderConstruction from '@/components/UnderConstruction/UnderConstruction'
 import { Metadata } from 'next'
 import { ReactNode } from 'react'
 import {
@@ -33,9 +34,36 @@ export function createLocalizedPageTemplate(
 	// Компонент страницы
 	async function Page({ params: { locale } }: LocalePageProps) {
 		const pageData = await getLocalizedPageData(pageId, locale)
-		const { pagecontent, title } = pageData
 
-		return renderPage({ pagecontent, title, locale })
+		const { pagecontent, title, underConstruction } = pageData
+		// Проверка на строгое равенство с true
+		const shouldShowUnderConstruction = underConstruction === true
+
+		// Если страница в режиме "Under construction", показываем соответствующий компонент
+		if (shouldShowUnderConstruction) {
+			return <UnderConstruction locale={locale} />
+		}
+
+		// Иначе рендерим обычное содержимое страницы
+		try {
+			return renderPage({ pagecontent, title, locale })
+		} catch (error) {
+			console.error(`Error rendering page ${pageId}:`, error)
+			return (
+				<div className='error-container'>
+					<h1>
+						{locale === 'ru'
+							? 'Ошибка отображения страницы'
+							: 'Error rendering page'}
+					</h1>
+					<p>
+						{locale === 'ru'
+							? 'Пожалуйста, попробуйте позже'
+							: 'Please try again later'}
+					</p>
+				</div>
+			)
+		}
 	}
 
 	return {

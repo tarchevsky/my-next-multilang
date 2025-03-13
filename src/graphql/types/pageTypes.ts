@@ -42,11 +42,16 @@ export interface Content {
 	}
 }
 
+export interface UnderConstructionData {
+	underConstruction: boolean
+}
+
 export interface Translation {
 	translation: {
 		seo: Seo
 		title: string
 		pagecontent: Content
+		underConstruction?: UnderConstructionData
 	}
 }
 

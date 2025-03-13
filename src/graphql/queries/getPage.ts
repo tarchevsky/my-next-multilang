@@ -44,6 +44,9 @@ export const GET_PAGE = gql`
 						}
 					}
 				}
+				underConstruction {
+					underConstruction
+				}
 				seo {
 					metaDesc
 					title
