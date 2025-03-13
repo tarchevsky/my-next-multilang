@@ -26,6 +26,20 @@ export const GET_POST_BY_SLUG = gql`
 				slug
 				content
 				title
+				pagesOptions {
+					relatedPosts {
+						edges {
+							node {
+								... on Post {
+									id
+									slug
+									title
+									link
+								}
+							}
+						}
+					}
+				}
 				seo {
 					title
 					metaDesc

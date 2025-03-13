@@ -42,8 +42,19 @@ export interface Content {
 	}
 }
 
-export interface UnderConstructionData {
+export interface RelatedPost {
+	id: string
+	slug: string
+	title: string
+}
+
+export interface Options {
 	underConstruction: boolean
+	relatedPosts?: {
+		edges: {
+			node: RelatedPost
+		}[]
+	}
 }
 
 export interface Translation {
@@ -51,7 +62,7 @@ export interface Translation {
 		seo: Seo
 		title: string
 		pagecontent: Content
-		underConstruction?: UnderConstructionData
+		pagesOptions?: Options
 	}
 }
 

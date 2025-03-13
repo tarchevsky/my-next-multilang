@@ -3,9 +3,11 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import RelatedPosts from '@/components/relatedPosts/RelatedPosts'
 import { GET_ALL_POST_SLUGS } from '@/graphql/queries/getAllPostSlugs'
 import { GET_POST_BY_SLUG } from '@/graphql/queries/getPostBySlug'
 import { LanguageCodeFilterEnum } from '@/graphql/types/commonTypes'
+import { RelatedPost } from '@/graphql/types/pageTypes'
 import { Post, SiteSettings } from '@/graphql/types/postTypes'
 import { getApolloClient } from '@/lib/apollo-client'
 
@@ -96,6 +98,11 @@ const PostPage = async ({ params }: LocalePostPageProps) => {
 	const dateText = locale === 'ru' ? 'Дата' : 'Date'
 	const blogText = locale === 'ru' ? 'Блог' : 'Blog'
 
+	const relatedPosts =
+		postData.pagesOptions?.relatedPosts?.edges.map(
+			(edge: { node: RelatedPost }) => edge.node
+		) || []
+
 	return (
 		<div>
 			<div className='cont'>
@@ -137,6 +144,10 @@ const PostPage = async ({ params }: LocalePostPageProps) => {
 						</>
 					)}
 				</main>
+				<RelatedPosts
+					posts={relatedPosts}
+					title={locale === 'ru' ? 'Связанные статьи' : 'Related posts'}
+				/>
 			</div>
 			<div className='px-[16px]'>
 				<section className='prose m-auto'>

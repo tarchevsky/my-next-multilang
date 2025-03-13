@@ -48,7 +48,7 @@ export async function getLocalizedPageData(pageId: string, locale: string) {
 
 		try {
 			// Получаем значение underConstruction
-			const underConstructionData = data.page.translation.underConstruction
+			const underConstructionData = data.page.translation.pagesOptions
 
 			// Если данные есть, пытаемся получить значение
 			if (
@@ -77,6 +77,7 @@ export async function getLocalizedPageData(pageId: string, locale: string) {
 			pagecontent: data.page.translation.pagecontent,
 			title: data.page.translation.title,
 			underConstruction: isUnderConstruction,
+			pagesOptions: data.page.translation.pagesOptions,
 		}
 
 		return result
@@ -86,6 +87,7 @@ export async function getLocalizedPageData(pageId: string, locale: string) {
 			pagecontent: null,
 			title: locale === 'ru' ? 'Ошибка загрузки' : 'Loading Error',
 			underConstruction: false,
+			pagesOptions: undefined,
 		}
 	}
 }

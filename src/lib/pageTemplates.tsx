@@ -1,4 +1,5 @@
 import UnderConstruction from '@/components/UnderConstruction/UnderConstruction'
+import { Options } from '@/graphql/types/pageTypes'
 import { Metadata } from 'next'
 import { ReactNode } from 'react'
 import {
@@ -19,6 +20,7 @@ export function createLocalizedPageTemplate(
 		pagecontent: any
 		title: string
 		locale: string
+		pagesOptions?: Options
 	}) => ReactNode
 ) {
 	// Функция для генерации метаданных
@@ -34,8 +36,9 @@ export function createLocalizedPageTemplate(
 	// Компонент страницы
 	async function Page({ params: { locale } }: LocalePageProps) {
 		const pageData = await getLocalizedPageData(pageId, locale)
+		console.log('Page data:', pageData)
 
-		const { pagecontent, title, underConstruction } = pageData
+		const { pagecontent, title, underConstruction, pagesOptions } = pageData
 		// Проверка на строгое равенство с true
 		const shouldShowUnderConstruction = underConstruction === true
 
@@ -46,7 +49,7 @@ export function createLocalizedPageTemplate(
 
 		// Иначе рендерим обычное содержимое страницы
 		try {
-			return renderPage({ pagecontent, title, locale })
+			return renderPage({ pagecontent, title, locale, pagesOptions })
 		} catch (error) {
 			console.error(`Error rendering page ${pageId}:`, error)
 			return (

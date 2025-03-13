@@ -1,3 +1,5 @@
+import { Options } from './pageTypes'
+
 export interface PostNode {
 	id: string
 	title: string
@@ -40,6 +42,7 @@ export interface PostTranslation {
 		title: string
 		metaDesc: string
 	}
+	pagesOptions?: Options
 }
 
 export interface Post {
@@ -59,6 +62,7 @@ export interface Post {
 		metaDesc: string
 	}
 	translation?: PostTranslation
+	pagesOptions?: Options
 }
 
 export interface SiteSettings {

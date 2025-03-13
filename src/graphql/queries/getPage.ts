@@ -44,8 +44,19 @@ export const GET_PAGE = gql`
 						}
 					}
 				}
-				underConstruction {
+				pagesOptions {
 					underConstruction
+					relatedPosts {
+						edges {
+							node {
+								... on Post {
+									id
+									slug
+									title
+								}
+							}
+						}
+					}
 				}
 				seo {
 					metaDesc

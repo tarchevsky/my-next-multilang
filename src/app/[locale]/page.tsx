@@ -1,5 +1,7 @@
 import Hero from '@/components/hero/Hero'
 import PostsList from '@/components/postsList/PostsList'
+import RelatedPosts from '@/components/relatedPosts/RelatedPosts'
+import { RelatedPost } from '@/graphql/types/pageTypes'
 import { getApolloClient } from '@/lib/apollo-client'
 import { createLocalizedPageTemplate } from '@/lib/pageTemplates'
 import { getPostsByCategories } from '@/lib/posts'
@@ -17,7 +19,7 @@ const CATEGORY_IDS = {
 const { generateMetadata, generateStaticParams, Page } =
 	createLocalizedPageTemplate(
 		HOME_PAGE_ID,
-		async ({ pagecontent, title, locale }) => {
+		async ({ pagecontent, title, locale, pagesOptions }) => {
 			const apolloClient = getApolloClient()
 			const categoryIn = CATEGORY_IDS[locale as keyof typeof CATEGORY_IDS]
 
@@ -28,9 +30,17 @@ const { generateMetadata, generateStaticParams, Page } =
 				locale
 			)
 
+			const relatedPosts =
+				pagesOptions?.relatedPosts?.edges.map(
+					(edge: { node: RelatedPost }) => edge.node
+				) || []
+
+			console.log('pagesOptions:', pagesOptions)
+			console.log('relatedPosts:', relatedPosts)
+
 			return (
 				<div className='cont'>
-					<h1>{title}</h1>
+					<h1 className='text-4xl font-bold mb-6'>{title}</h1>
 
 					{pagecontent.heroImage && (
 						<Hero
@@ -39,11 +49,22 @@ const { generateMetadata, generateStaticParams, Page } =
 						/>
 					)}
 
-					<PostsList
-						postsTitle={locale === 'ru' ? 'Список постов' : 'Posts list'}
-						posts={posts}
-						readText={locale === 'ru' ? 'Читать статью' : 'Read article'}
-					/>
+					<div className='mt-16'>
+						<PostsList
+							postsTitle={locale === 'ru' ? 'Список постов' : 'Posts list'}
+							posts={posts}
+							readText={locale === 'ru' ? 'Читать статью' : 'Read article'}
+						/>
+					</div>
+
+					{relatedPosts.length > 0 && (
+						<RelatedPosts
+							posts={relatedPosts}
+							title={
+								locale === 'ru' ? 'Рекомендуемые статьи' : 'Recommended posts'
+							}
+						/>
+					)}
 				</div>
 			)
 		}
